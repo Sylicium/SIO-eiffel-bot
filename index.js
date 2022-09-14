@@ -346,7 +346,11 @@ bot.on("interactionCreate", async (interaction) => {
         try {
             await interaction.reply(the_error_msg)
         } catch(e) {
-            await interaction.editReply(the_error_msg)
+            try {
+                await interaction.editReply(the_error_msg)
+            } catch(err) {
+                Logger.warn(err)
+            }
         }
     })
 
@@ -392,6 +396,13 @@ bot.on("guildMemberAdd", (member) => {
         Logger.debug("member",member)
         let chan = bot.channels.cache.get(config.static.channels.general)
         if(member.guild.id != chan.guild.id) return;
+
+
+        let verif_chan = bot.channels
+
+
+
+
         chan.send({
             content: `Bienvenue <@${member.id}>`,
             embeds: [
@@ -414,6 +425,12 @@ bot.on("guildMemberAdd", (member) => {
         Logger.warn(`${e}`)
         Logger.warn(e)
     }
+})
+
+
+
+bot.on("messageCreate", message => {
+    if(message.content.indexOf(bot.user.id) != -1) message.reply("coucou de l'instance 2 (en local chez <@770334301609787392>)")
 })
 
 

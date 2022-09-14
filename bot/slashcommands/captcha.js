@@ -60,11 +60,10 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
     let fill_color = `#${gChar(2)}${gChar(3)}${gChar(2)}${gChar(3)}${gChar(2)}${gChar(3)}`
 
     captcha = svgCaptcha.create({
-        ignoreChars: "0o1il",
+        ignoreChars: "0o1ilI",
         stroke: stroke_color,
         fill: fill_color,
-        size: 6,
-        background: "#1A1C00"
+        size: 6
     })
 
 

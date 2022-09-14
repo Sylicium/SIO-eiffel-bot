@@ -407,3 +407,16 @@ async function logError(err, temp_options={
         }
     }
 }
+
+
+
+
+function generateCaptcha() {
+    
+    /*
+    svg2img(captcha.data, { format: 'png' }, async function(err, data) {
+
+    })*/
+
+
+}

@@ -40,7 +40,6 @@ module.exports.execute = async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h
 
     let captcha;
 
-
     /*captcha = {
         text: "Dibistan",
         data: svgCaptcha.createCaptcha("Dibistan")

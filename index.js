@@ -17,6 +17,15 @@ let birthdays = {
     }
 }
 
+
+let GlobalTemp = {
+    cooldowns: {
+        buttons: {
+
+        }
+    }
+}
+
 try {
     require("dotenv").config()
 } catch(e) {}
@@ -276,7 +285,7 @@ bot.on("interactionCreate", async (interaction) => {
     if(!hasPerm_bot.havePerm) {
         return interaction.reply({
             embeds: [
-                new EmbedBuilder()
+                new Discord.EmbedBuilder()
                     .setColor("FF0000")
                     .setTitle(`🤖 Aie.. Le bot manque de permissions!`)
                     .setDescription(`Il a besoin des permissions suivantes:\n${hasPerm_bot.missingPermissions.map((x) => {
@@ -370,6 +379,36 @@ bot.on('interactionCreate', async interaction => {
 
     //let data = await Database.getGuildDatas(interaction.guild.id)
 
+    if(interaction.customId == "roleselector__help_button_fcfafdd400f799f5") {
+        let timeToWait = 1000*60*15
+        if(GlobalTemp.cooldowns.buttons["roleselector__help_button_fcfafdd400f799f5"]) {
+            if(GlobalTemp.cooldowns.buttons["roleselector__help_button_fcfafdd400f799f5"]+timeToWait > Date.now()) {
+                await interaction.reply({
+                    content: `Vous avez déjà utilisé ce bouton, patientez encore <t:${Math.floor((GlobalTemp.cooldowns.buttons["roleselector__help_button_fcfafdd400f799f5"]+timeToWait)/1000)}:R>`,
+                    ephemeral: true
+                })
+                return;
+            }
+        }
+        GlobalTemp.cooldowns.buttons["roleselector__help_button_fcfafdd400f799f5"] = Date.now()
+        interaction.deferUpdate()
+        let chan = bot.channels.cache.get(config.static.channels.general)
+        chan.send({
+            content: `<@${interaction.user.id}> Votre demande d'aide a été créée.\n<@&${config.static.roles.miniboss}>`,
+            embeds: [
+                (
+                    new Discord.EmbedBuilder()
+                        .setTitle(`${interaction.user.tag} a un problème avec ses roles !`)
+                        .setColor("ffa500")
+                        .setAuthor({ name: `${interaction.user.tag}`, icon_url: interaction.user.displayAvatarURL()})
+                        .setDescription(`Demande d'aide effectuée le <t:${Math.floor(Date.now()/1000)}> \`\`\`Veuillez expliquer clairement votre problème dans ce channel.\`\`\` `)
+                        .setThumbnail(interaction.user.displayAvatarURL())
+                        .setFooter({ text: `ID: ${interaction.user.id}`})
+                        .setTimestamp()
+                )
+            ]
+        })
+    }
 
 
     //console.log(interaction);
@@ -391,36 +430,138 @@ bot.on('messageCreate', async (message) => {
 });
 
 
-bot.on("guildMemberAdd", (member) => {
+bot.on("guildMemberAdd", async (member) => {
     try {
-        Logger.debug("member",member)
-        let chan = bot.channels.cache.get(config.static.channels.general)
-        if(member.guild.id != chan.guild.id) return;
+        //Logger.debug("member",member)
+        // let chan = bot.channels.cache.get(config.static.channels.general)
+        // if(member.guild.id != chan.guild.id) return;
 
-
-        let verif_chan = bot.channels
-
-
-
-
-        chan.send({
-            content: `Bienvenue <@${member.id}>`,
-            embeds: [
-                (new Discord.EmbedBuilder()
-                .setDescription([`N’hésite pas à la aller voir les règles dans [#glados-rules](<#404573626134822912>) 😄 !`,
-                    ``,
-                    `Aaah oui, renomme toi en **NOM + Prénom** et dis moi ta classe pour que t’attribue le rôle.`,
-                    ``,
-                    `Merci ! 😉`,
-                    `_(ah et va bien lire les règles.. clément guette..)_`,
-                ].join("\n"))
-                .setColor(`${somef.genHex(6)}`)
-                .setImage("https://media.discordapp.net/attachments/403472421136367618/1019687572458446958/IMG_0627.jpg")
+        // chan.send({
+        //     content: `Bienvenue <@${member.id}>`,
+        //     embeds: [
+        //         (new Discord.EmbedBuilder()
+        //         .setDescription([`N’hésite pas à la aller voir les règles dans [#glados-rules](<#404573626134822912>) 😄 !`,
+        //             ``,
+        //             `Aaah oui, renomme toi en **NOM + Prénom** et dis moi ta classe pour que t’attribue le rôle.`,
+        //             ``,
+        //             `Merci ! 😉`,
+        //             `_(ah et va bien lire les règles.. clément guette..)_`,
+        //         ].join("\n"))
+        //         .setColor(`${somef.genHex(6)}`)
+        //         .setImage("https://media.discordapp.net/attachments/403472421136367618/1019687572458446958/IMG_0627.jpg")
                 
-                )
+        //         )
                 
+        //     ]
+        // })
+        try {
+            member.roles.add(config.static.roles.captcha_locked).catch(e => { Logger.warn(e) })
+        } catch(e) {
+            Logger.warn(e)
+        }
+
+        let verif_chan = await member.guild.channels.create({
+            name: `captcha-${member.user.username.substr(0,10)}-${member.user.discriminator}`,
+            type: Discord.ChannelType.GuildText,
+            permissionOverwrites: [
+                {
+                    id: member.guild.id,
+                    deny: [Discord.PermissionsBitField.Flags.ViewChannel],
+                },
+                {
+                    id: member.id,
+                    allow: [
+                        Discord.PermissionsBitField.Flags.ViewChannel, Discord.PermissionsBitField.Flags.SendMessages
+                    ],
+                },
+                {
+                    id: bot.user.id,
+                    allow: [
+                        Discord.PermissionsBitField.Flags.ViewChannel,
+                        Discord.PermissionsBitField.Flags.SendMessages,
+                        Discord.PermissionsBitField.Flags.ManageMessages,
+                        Discord.PermissionsBitField.Flags.EmbedLinks,
+                        Discord.PermissionsBitField.Flags.AttachFiles,
+                        Discord.PermissionsBitField.Flags.ReadMessageHistory,
+                    ],
+                },
+                {
+                    id: config.static.roles.miniboss,
+                    allow: [
+                        Discord.PermissionsBitField.Flags.ViewChannel,
+                        Discord.PermissionsBitField.Flags.SendMessages,
+                        Discord.PermissionsBitField.Flags.ManageMessages,
+                        Discord.PermissionsBitField.Flags.EmbedLinks,
+                        Discord.PermissionsBitField.Flags.AttachFiles,
+                        Discord.PermissionsBitField.Flags.ReadMessageHistory,
+                    ],
+                },
+            ],
+        });
+
+        let captcha = await botf.generateCaptcha()
+
+        let captcha_time = 60*1000 // en milliseconde
+
+        verif_chan.send({
+            content: `<@${member.id}> Merci de compléter ce captcha en envoyant un message ici de ce que vous lisez.\nLe code est constitué de 6 caractères lettre minuscule/majuscule et chiffre.\nLe captcha prendra fin <t:${Math.floor((Date.now()+captcha_time)/1000)}:R>`,
+            files: [
+                captcha.attachment
             ]
+        }).then(async captcha_msg => {
+
+            const filter = m => { return (m.author.id == member.id) };
+            const collector = await verif_chan.createMessageCollector({ filter, time: captcha_time, max:1 });
+    
+            let answered = false
+    
+            collector.on('collect', m => {
+                //logger.debug("collect collector",m)
+                answered = true
+                m.delete().catch(e => {
+                    logger.warn(`Can't delete captcha response message: ${e}`)
+                })
+    
+                if(m.content == captcha.text) {
+                    captcha_msg.edit({ content: `<@${m.author.id}> ✅ Captcha correct.`, files:[]})
+                    member.roles.remove(config.static.roles.captcha_locked)
+
+                } else {
+                    captcha_msg.edit({ content: `<@${m.author.id}> ❌ Réponse erronée au captcha.`, files:[]})
+                    setTimeout(() => {
+                        member.kick(`AutoAction | Failed captcha.`)
+                    }, 12*1000)
+                }
+    
+            })
+    
+    
+            collector.on("end", collected  => {
+                //logger.debug("ended collector",collected)
+                setTimeout(() => {
+                    if(!answered) {
+                        captcha_msg.edit({ content: `<@${member.id}> ❌ Vous avez mis trop de temps à faire le captcha.`, files:[]})
+                        setTimeout(() => {
+                            member.kick(`AutoAction | Too much time to perfom captcha.`)
+                        }, 12*1000)
+                    }
+                }, 200)
+                setTimeout(() => {
+                    try {
+                        verif_chan.delete().catch(e => { Logger.warn(e) })
+                    } catch(e) { Logger.warn(e) }
+                }, 10*1000)
+            })
+
+        }).catch(e => {
+            logger.warn(`${e}`)
+            logger.warn(e)
         })
+        
+
+
+
+
     } catch(e) {
         Logger.warn(`${e}`)
         Logger.warn(e)
@@ -434,6 +575,140 @@ bot.on("messageCreate", message => {
 })
 
 
+bot.on('interactionCreate', async (interaction) => {
+    if (!interaction.isSelectMenu()) return;
+    Logger.log("select interaction:",interaction)
+
+    if(interaction.customId == "roleselector__roleselect_fcfafdd400f799f5") {
+        
+        if(!interaction.member.nickname) {
+            
+		    const temp_modal = new Discord.ModalBuilder()
+                .setCustomId('modal_change_nickname')
+                .setTitle('Se renommer en NOM prénom');
+
+            const temp_modal_1 = new Discord.TextInputBuilder()
+                .setCustomId('lastname')
+                .setLabel("Nom de famille")
+                .setStyle(Discord.TextInputStyle.Short);
+
+            const temp_modal_2 = new Discord.TextInputBuilder()
+                .setCustomId('firstname')
+                .setLabel("Prénom")
+                .setStyle(Discord.TextInputStyle.Short);
+
+            const temp_actionrow1 = new Discord.ActionRowBuilder().addComponents(temp_modal_1);
+            const temp_actionrow2 = new Discord.ActionRowBuilder().addComponents(temp_modal_2);
+
+            temp_modal.addComponents(temp_actionrow1, temp_actionrow2);
+            interaction.showModal(temp_modal);
+            return;
+        }
+
+        //interaction.deferUpdate()
+        if(interaction.values.length == 0) return await interaction.reply({
+            content: `Hmm, une erreur inconnue est survenue, merci de réessayer. (E#01)`,
+            ephemeral: true
+        })
+        let val = interaction.values[0]
+
+        if(val == "void") { return interaction.deferUpdate() }
+
+
+        let alreadyHasArole = interaction.member.roles.cache.map(x => x).filter((r) => { return (
+            (r.id == config.static.roles.sio1a)
+            || (r.id == config.static.roles.sio1b)
+            || (r.id == config.static.roles.sio2a)
+            || (r.id == config.static.roles.sio2b)
+            || (r.id == config.static.roles.ancien)
+        ) } )
+        //Logger.debug("alreadyHasArole",alreadyHasArole)
+
+        if(alreadyHasArole.length > 0) {
+            await interaction.reply({
+                content: `Vous possédez déjà un rôle pour une classe. Si vous avez fait une erreur, cliquez sur le bouton **Aide** pour demander de l'aide.`,
+                ephemeral: true,
+            })
+            return;
+        }
+
+        if(val == "sio1a") {
+            interaction.member.roles.add(config.static.roles.sio1a).then(() => {
+                interaction.reply({ content: `✅ Le rôle sio1a vous a été attribué !`, ephemeral: true })
+            }).catch(e => {
+                Logger.warn(e)
+                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role sio1a: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
+            })
+        }
+        else if(val == "sio1b") {
+            interaction.member.roles.add(config.static.roles.sio1b).then(() => {
+                interaction.reply({ content: `✅ Le rôle sio1b vous a été attribué !`, ephemeral: true })
+            }).catch(e => {
+                Logger.warn(e)
+                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role sio1b: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
+            })
+        }
+        else if(val == "sio2a") {
+            interaction.member.roles.add(config.static.roles.sio2a).then(() => {
+                interaction.reply({ content: `✅ Le rôle sio2a vous a été attribué !`, ephemeral: true })
+            }).catch(e => {
+                Logger.warn(e)
+                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role sio2a: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
+            })
+        }
+        else if(val == "sio2b") {
+            interaction.member.roles.add(config.static.roles.sio2b).then(() => {
+                interaction.reply({ content: `✅ Le rôle sio2b vous a été attribué !`, ephemeral: true })
+            }).catch(e => {
+                Logger.warn(e)
+                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role sio2b: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
+            })
+        }
+        else if(val == "ancien") {
+            interaction.member.roles.add(config.static.roles.ancien).then(() => {
+                interaction.reply({ content: `✅ Le rôle ancien vous a été attribué !`, ephemeral: true })
+            }).catch(e => {
+                Logger.warn(e)
+                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role ancien: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
+            })
+        }
+        else {
+            await nteraction.reply({
+                content: `Hmm, une erreur inconnue est survenue, merci de réessayer. (E#02)`,
+                ephemeral: true
+            })
+        }
+        
+
+    }
+    
+	console.log(interaction);
+});
+
+
+
+bot.on("interactionCreate", interaction => {
+	if (!interaction.isModalSubmit()) return;
+    //Logger.debug("modalsubmit:",interaction)
+
+    if(interaction.customId == "modal_change_nickname") {
+        let lastname = (interaction.fields.getTextInputValue("lastname") || null)
+        let firstname = (interaction.fields.getTextInputValue("firstname") || null)
+        if(!lastname || !firstname) {
+            interaction.reply({
+                content: `Une erreur s'est produite, veuillez réessayer.`,
+                ephemeral: true
+            })
+            return;
+        }
+        let new_nickname = `${lastname.toUpperCase()} ${firstname.toLowerCase().capitalize()}`
+        interaction.member.setNickname(new_nickname)
+        interaction.reply({
+            content: `Vous avez été renommé en \`${new_nickname}\`\n\n:warning: Pour bien re-selectionner votre classe selectionnez **=== Void ===** puis selectionnez à nouveau votre classe`,
+            ephemeral: true
+        })
+    }
+})
 
 
 bot.login(config.bot.token)

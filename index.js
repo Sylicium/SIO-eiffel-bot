@@ -61,11 +61,11 @@ let bot = new Discord.Client({
         Discord.Partials.User
     ],
     presence: {
-      status: 'online',
-      activity: {
-        name: `la télé`,
-        type: 'WATCHING'
-      }
+        status: "online",
+        activities: [{
+            name: 'v3.0.0',
+            type: "LISTENING",
+        }]
     }
 })
 
@@ -117,6 +117,16 @@ fs.readdirSync("./bot/slashcommands").forEach(file => {
 bot.on("ready", () => {
     Logger.info(`[BOT]: Bot démarré en tant que ${bot.user.tag}`)
     //console.log(`Bot démarré en tant que ${bot.user.tag} | ${Object.size(bot.guilds.cache)} serveurs rejoints`)
+
+    bot.user.setPresence({
+        status: "online",
+        activities: [
+            {
+                name: `v${config.bot.version}`,
+                type: "PLAYING"
+            }
+        ]
+    });
 
 
     let birthdayChannel = bot.channels.cache.get(config.static.channels.birthday)
@@ -632,7 +642,14 @@ bot.on('interactionCreate', async (interaction) => {
             return;
         }
 
+        function addEleveRole() {
+            interaction.member.roles.add(config.static.roles.eleves).catch(e => {
+                Logger.warn(e)
+            })
+        }
+
         if(val == "sio1a") {
+            addEleveRole()
             interaction.member.roles.add(config.static.roles.sio1a).then(() => {
                 interaction.reply({ content: `✅ Le rôle sio1a vous a été attribué !`, ephemeral: true })
             }).catch(e => {
@@ -641,6 +658,7 @@ bot.on('interactionCreate', async (interaction) => {
             })
         }
         else if(val == "sio1b") {
+            addEleveRole()
             interaction.member.roles.add(config.static.roles.sio1b).then(() => {
                 interaction.reply({ content: `✅ Le rôle sio1b vous a été attribué !`, ephemeral: true })
             }).catch(e => {
@@ -649,6 +667,7 @@ bot.on('interactionCreate', async (interaction) => {
             })
         }
         else if(val == "sio2a") {
+            addEleveRole()
             interaction.member.roles.add(config.static.roles.sio2a).then(() => {
                 interaction.reply({ content: `✅ Le rôle sio2a vous a été attribué !`, ephemeral: true })
             }).catch(e => {
@@ -657,6 +676,7 @@ bot.on('interactionCreate', async (interaction) => {
             })
         }
         else if(val == "sio2b") {
+            addEleveRole()
             interaction.member.roles.add(config.static.roles.sio2b).then(() => {
                 interaction.reply({ content: `✅ Le rôle sio2b vous a été attribué !`, ephemeral: true })
             }).catch(e => {
@@ -665,6 +685,7 @@ bot.on('interactionCreate', async (interaction) => {
             })
         }
         else if(val == "ancien") {
+            addEleveRole()
             interaction.member.roles.add(config.static.roles.ancien).then(() => {
                 interaction.reply({ content: `✅ Le rôle ancien vous a été attribué !`, ephemeral: true })
             }).catch(e => {
@@ -673,7 +694,7 @@ bot.on('interactionCreate', async (interaction) => {
             })
         }
         else {
-            await nteraction.reply({
+            await interaction.reply({
                 content: `Hmm, une erreur inconnue est survenue, merci de réessayer. (E#02)`,
                 ephemeral: true
             })

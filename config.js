@@ -10,6 +10,7 @@ module.exports = {
         port: 3333
     },
     bot: {
+        version: "3.0.0",
         prefix: "!",
         id: "1014189091249733722",
         token: process.env["TOKEN"],
@@ -52,6 +53,7 @@ module.exports = {
             sio2a: "", //"405060752601251851",
             sio2b: "1020097535047639110", //"405060115654508557",
             ancien: "",
+            eleves: "",
             captcha_locked: "1020021259247030353",
             miniboss: "906676964272775188",
         }
@@ -66,6 +68,7 @@ module.exports = {
             sio2a: "405060752601251851",
             sio2b: "405060115654508557",
             ancien: "405060215667687427",
+            eleves: "1021364692842729523",
             captcha_locked: "1020102220995383326",
             miniboss: "404230377767567360",
         }

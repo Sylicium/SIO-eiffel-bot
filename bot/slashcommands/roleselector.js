@@ -29,57 +29,66 @@ module.exports = {
     execute: async (Modules, bot, interaction, data, a,b,c,d,e,f,g,h) => {
 
 
+        let getOptionsPayload_pre1 = []
+
+        for(let key in config.static.roleSelector) {
+            getOptionsPayload_pre1.push({ name: key, id: config.static.roleSelector[key] })
+        }
+
+
+        function *getNextEmoji() {
+            let list = [
+                `0️⃣`,`1️⃣`,`2️⃣`,`3️⃣`,`4️⃣`,`5️⃣`,`6️⃣`,`7️⃣`,`8️⃣`,`9️⃣`,`🔟`
+            ]
+            for(let i in list) {
+                yield list[i]
+            }
+        }
+        let nextEmj = getNextEmoji()
+
+        let getOptionsPayload = getOptionsPayload_pre1.map(x => {
+            return {
+                label: x.name,
+                //description: x.name,
+                value: x.id,
+                emoji: nextEmj.next().value,
+            }
+        })
+
+        logger.debug("getOptionsPayload:",getOptionsPayload)
+
+
         let buttonID_help_button = `roleselector__help_button_fcfafdd400f799f5`
         let buttonID_role_select = `roleselector__roleselect_fcfafdd400f799f5`
+        let buttonID_reglement_button = `roleselector__reglement_fcfafdd400f799f5`
 
         const row = new Discord.ActionRowBuilder()
         .addComponents(
-            new Discord.SelectMenuBuilder()
+            new Discord.StringSelectMenuBuilder()
                 .setCustomId(buttonID_role_select)
-                .setPlaceholder("Selectionne ta classe")
+                .setPlaceholder("Selectionne tes roles")
                 .setMinValues(0)
-                .setMaxValues(25)
-                .addOptions([
-                    {
-                        label: '=== Void ===',
-                        description: 'Selection vide',
-                        value: 'void',
-                    },
-                    {
-                        label: 'SIO1A',
-                        description: 'SIO en première année, classe A',
-                        value: 'sio1a',
-                    },
-                    {
-                        label: 'SIO1B',
-                        description: 'SIO en première année, classe B',
-                        value: 'sio1b',
-                    },
-                    {
-                        label: 'SIO2A',
-                        description: 'SIO en seconde année, classe A',
-                        value: 'sio2a',
-                    },
-                    {
-                        label: 'SIO2B',
-                        description: 'SIO en seconde année, classe B',
-                        value: 'sio2b',
-                    },
-                    {
-                        label: 'Ancien',
-                        description: 'Si tu est un ancien élève du lycée',
-                        value: 'ancien',
-                    },
-                ]),
-        );
+                .setMaxValues( (getOptionsPayload.length > 25 ? 25 : getOptionsPayload.length) )
+                .addOptions(getOptionsPayload),
+        )
 
-        
+        /*
         const row2 = new Discord.ActionRowBuilder()
         .addComponents(
             new Discord.ButtonBuilder()
                 .setCustomId(buttonID_help_button)
                 .setLabel("Aide")
                 .setStyle(Discord.ButtonStyle.Primary)
+        );*/
+
+
+        const row2 = new Discord.ActionRowBuilder()
+        .addComponents(
+            new Discord.ButtonBuilder()
+                .setCustomId(buttonID_reglement_button)
+                .setLabel("Accepter le règlement")
+                .setStyle(Discord.ButtonStyle.Success)
+                .setEmoji(`📜`)
         );
         
 
@@ -87,22 +96,7 @@ module.exports = {
             content: `Selectionnez votre classe après avoir lu les règles.\nSi vous vous êtes trompé de classe, cliquez sur le bouton **Aide**.\nObtenir un role signifie que vous acceptez le règlement.`,
             components: [row,row2]
         });
-        await interaction.reply({
-            content: `Message envoyé.`,
-            ephemeral: true
-        })
 
         
-        const filter = i => ( (i.customId == buttonID_help_button) || (i.customId == buttonID_role_select) );
-        const collector = interaction.channel.createMessageComponentCollector({ filter, });
-
-        collector.on("collect", async i => {
-            if((i.message.createdTimestamp + 1000*60) < (Date.now())) return i.reply({
-                content: "Cette interaction a expirée.",
-                ephemeral: true
-            })
-
-        })
-
     }
 }

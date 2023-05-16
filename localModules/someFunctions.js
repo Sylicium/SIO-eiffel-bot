@@ -14,6 +14,36 @@ Object.defineProperty(String.prototype, 'capitalize', {
 });
 
 
+/**
+ * f()
+ */
+module.exports.saveUncaughtError = saveUncaughtError
+function saveUncaughtError(err, specialSuffix=undefined, additionnalInformations="No additional informations provided.") {
+    if(specialSuffix == undefined) specialSuffix = "GEN"
+    let UUID = `${genHex(8)}-${specialSuffix}`
+    let datas = [
+        `----------------------------------------`,
+        `Error UUID is: ${UUID}`,
+        `Error occured on ${(new Date()).toLocaleString("fr")} (${Date.now()})`,
+        `Error: ${err}`,
+        `----------------------------------------`,
+        ``,
+        `Stack: ${err.stack}`,
+        ``,
+        `----------------------------------------`,
+        `Additionnal informations provided in the call of the saving function:`,
+        `----------------------------------------`,
+        ``,
+        `${additionnalInformations}`,
+        ``,
+    ].join("\n")
+    fs.writeFileSync(`./logs/uncaughtErrors/${UUID}.log`, datas)
+    return {
+        err: err,
+        UUID: UUID,
+    }
+}
+
 
 /**
  * f() : Booléen qui retourne true si l'ID est celui d'un SuperAdmin

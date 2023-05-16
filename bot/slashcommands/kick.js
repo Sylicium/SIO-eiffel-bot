@@ -35,7 +35,7 @@ module.exports = {
         },
         rolesNeeded: [],
         superAdminOnly: false,
-        disabled: false,
+        disabled: true,
         indev: false,
         hideOnHelp: false
     },

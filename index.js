@@ -330,8 +330,18 @@ bot.on('interactionCreate', async interaction => {
                 )
             ]
         })
-    }
+    } else if(interaction.customId == "roleselector__reglement_fcfafdd400f799f5") {
+        try {
+            interaction.member.roles.add(config.static.roles.reglement).then(() => { }).catch(e => {
+                Logger.warn(e)
+            })
+            interaction.reply({ content: "Vous avez accepté le règlement, un rolee vous a été ajouté.", ephemeral: true})
+        } catch(e) {
+            let savedError = somef.saveUncaughtError(e, "INTERACTION", `bot.on('interactionCreate') > if (!interaction.isButton()) return; > interaction.customId == "roleselector__reglement_fcfafdd400f799f5" > try catch. `)
+            interaction.reply({ content: `Une erreur est survenue veuillez réessayer.\nSi l'erreur persiste, fournissez le code suivant à un administrateur: \`${savedError.UUID}\` `, ephemeral: true})
+        }
 
+    }
 
     //console.log(interaction);
 });
@@ -498,94 +508,58 @@ bot.on("messageCreate", message => {
 
 
 bot.on('interactionCreate', async (interaction) => {
-    if (!interaction.isSelectMenu()) return;
+    if (!interaction.isStringSelectMenu()) return;
     Logger.log("select interaction:",interaction)
 
+
+    
+
     if(interaction.customId == "roleselector__roleselect_fcfafdd400f799f5") {
+        
+        let isASelectionnableRole = (roleID) => {
+            for(let key in config.static.roleSelector) {
+                if(config.static.roleSelector[key] == roleID) return true
+            }
+            return false
+        }
 
-        //interaction.deferUpdate()
-        if(interaction.values.length == 0) return await interaction.reply({
-            content: `Hmm, une erreur inconnue est survenue, merci de réessayer. (E#01)`,
-            ephemeral: true
+        let selectionableRolesList = interaction.guild.roles.cache.filter((r) => isASelectionnableRole(r.id) )
+
+        let memberRoles = interaction.member.roles.cache.map(x => x).filter((r) => isASelectionnableRole(r.id) )
+        let memberRolesIDs = memberRoles.map(x => x.id)
+
+        let rolesToAdd = selectionableRolesList.filter(x => {
+            return interaction.values.includes(x.id) && !memberRolesIDs.includes(x.id)
         })
-        let val = interaction.values[0]
 
-        if(val == "void") { return interaction.deferUpdate() }
+        let rolesToRemove = selectionableRolesList.filter(x => {
+            return !interaction.values.includes(x.id) && memberRolesIDs.includes(x.id)
+        })
 
 
-        let alreadyHasArole = interaction.member.roles.cache.map(x => x).filter((r) => { return (
-            (r.id == config.static.roles.sio1a)
-            || (r.id == config.static.roles.sio1b)
-            || (r.id == config.static.roles.sio2a)
-            || (r.id == config.static.roles.sio2b)
-            || (r.id == config.static.roles.ancien)
-        ) } )
-        //Logger.debug("alreadyHasArole",alreadyHasArole)
 
-        if(alreadyHasArole.length > 0) {
-            await interaction.reply({
-                content: `Vous possédez déjà un rôle pour une classe. Si vous avez fait une erreur, cliquez sur le bouton **Aide** pour demander de l'aide.`,
-                ephemeral: true,
-            })
-            return;
-        }
+        Logger.debug("rolesToAdd:",rolesToAdd)
+        Logger.debug("rolesToRemove:",rolesToRemove)
 
-        function addEleveRole() {
-            interaction.member.roles.add(config.static.roles.eleves).catch(e => {
+        let textLogs = []
+        rolesToAdd.forEach(role => {
+            Logger.debug("role:",role)
+            interaction.member.roles.add(role.id).then(() => { }).catch(e => {
                 Logger.warn(e)
             })
-        }
+        })
+        rolesToRemove.forEach(role => {
+            interaction.member.roles.remove(role.id).then(() => { }).catch(e => {
+                Logger.warn(e)
+            })
+        })
 
-        if(val == "sio1a") {
-            addEleveRole()
-            interaction.member.roles.add(config.static.roles.sio1a).then(() => {
-                interaction.reply({ content: `✅ Le rôle sio1a vous a été attribué !`, ephemeral: true })
-            }).catch(e => {
-                Logger.warn(e)
-                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role sio1a: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
-            })
-        }
-        else if(val == "sio1b") {
-            addEleveRole()
-            interaction.member.roles.add(config.static.roles.sio1b).then(() => {
-                interaction.reply({ content: `✅ Le rôle sio1b vous a été attribué !`, ephemeral: true })
-            }).catch(e => {
-                Logger.warn(e)
-                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role sio1b: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
-            })
-        }
-        else if(val == "sio2a") {
-            addEleveRole()
-            interaction.member.roles.add(config.static.roles.sio2a).then(() => {
-                interaction.reply({ content: `✅ Le rôle sio2a vous a été attribué !`, ephemeral: true })
-            }).catch(e => {
-                Logger.warn(e)
-                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role sio2a: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
-            })
-        }
-        else if(val == "sio2b") {
-            addEleveRole()
-            interaction.member.roles.add(config.static.roles.sio2b).then(() => {
-                interaction.reply({ content: `✅ Le rôle sio2b vous a été attribué !`, ephemeral: true })
-            }).catch(e => {
-                Logger.warn(e)
-                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role sio2b: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
-            })
-        }
-        else if(val == "ancien") {
-            addEleveRole()
-            interaction.member.roles.add(config.static.roles.ancien).then(() => {
-                interaction.reply({ content: `✅ Le rôle ancien vous a été attribué !`, ephemeral: true })
-            }).catch(e => {
-                Logger.warn(e)
-                interaction.reply({ content: `❌ Une erreur est survenue à l'ajout du role ancien: **${e}** \`\`\`js\n${e.stack}\`\`\` `, ephemeral: true })
-            })
-        }
-        else {
-            await interaction.reply({
-                content: `Hmm, une erreur inconnue est survenue, merci de réessayer. (E#02)`,
-                ephemeral: true
-            })
+        if(interaction.values.length == 0) {
+            return await interaction.reply({ content: `✅ Tous les rôles vous ont été retirés`, ephemeral: true })
+        } else if(rolesToAdd.size == 0 && rolesToRemove.size == 0) {
+            return await interaction.reply({ content: `Aucun roles n'as été changé.`, ephemeral: true })
+        } else {
+            return await interaction.reply({ content: `Vos rôles ont été changés !`, ephemeral: true })
         }
         
 

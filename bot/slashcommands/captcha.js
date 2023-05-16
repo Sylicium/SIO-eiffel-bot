@@ -28,7 +28,7 @@ module.exports.commandInformations = {
     },
     rolesNeeded: [],
     superAdminOnly: false,
-    disabled: false,
+    disabled: true,
     indev: false,
     hideOnHelp: false
 },

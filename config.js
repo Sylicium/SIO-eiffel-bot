@@ -3,7 +3,7 @@ try {
     require("dotenv").config()
 } catch(e) { console.log(e) }
 
-let indev = false
+let indev = true
 
 module.exports = {
     website: {
@@ -45,32 +45,22 @@ module.exports = {
     static: (indev ? {
         channels: {
             general: "908349988235530240", // "403472421136367618"
-            birthday: "908349988235530240" //"403472421136367618"
         },
         roles: {
-            sio1a: "", //"405059851253841930",
-            sio1b: "", //"405060033790083082",
-            sio2a: "", //"405060752601251851",
-            sio2b: "1020097535047639110", //"405060115654508557",
-            ancien: "",
-            eleves: "",
-            captcha_locked: "1020021259247030353",
-            miniboss: "906676964272775188",
+            reglement: "1108101423201259640"
+        },
+        roleSelector: {
+            sio2a: "1108077234306174986",
+            sio2b: "1020097535047639110",
+            sio2c: "1108077272805670983",
         }
     } : {
         channels: {
-            general: "403472421136367618",
-            birthday: "403472421136367618",
+            general: "AAAAAAAAAAAAAAAAAAAAA",
         },
-        roles: {
-            sio1a: "405059851253841930",
-            sio1b: "405060033790083082",
-            sio2a: "405060752601251851",
-            sio2b: "405060115654508557",
-            ancien: "405060215667687427",
-            eleves: "1021364692842729523",
-            captcha_locked: "1020102220995383326",
-            miniboss: "404230377767567360",
+        roles: { },
+        roleSelector: {
+
         }
     }) 
 }

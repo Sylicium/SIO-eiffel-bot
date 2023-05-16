@@ -93,10 +93,68 @@ module.exports = {
         
 
         await interaction.channel.send({
-            content: `Selectionnez votre classe après avoir lu les règles.\nSi vous vous êtes trompé de classe, cliquez sur le bouton **Aide**.\nObtenir un role signifie que vous acceptez le règlement.`,
-            components: [row,row2]
+            content: "",
+            embeds:  [
+                {
+                  "id": 477778554,
+                  "color": 15290191,
+                  "fields": [
+                        {
+                            "id": 891451025,
+                            "name": "🔹 Règle n°1",
+                            "value": "Pas d'insultes, de racisme, d'homophobie ou de sexisme et réglez les disputes en privé !"
+                        },
+                        {
+                            "id": 13111183,
+                            "name": "🔹 Règle n°2",
+                            "value": "Pas de pub (serveur ou autres) sauf ceux autorisés ET dans les channels fait pour."
+                        },
+                        {
+                            "id": 982368710,
+                            "name": "🔹 Règle n°3",
+                            "value": "Respectez les chan et leurs utilité nous n'hésiterons pas a supprimer un post si celui ci n'a rien a faire sur un channel adapté."
+                        },
+                        {
+                            "id": 595584449,
+                            "name": "🔹 Règle n°4",
+                            "value": "Ne volez pas d'œuvres d'art et ne les revendiquez pas comme les vôtres (y compris les émotes). Les œuvres d'art volées sont faciles à trouver et toute infraction sera prise très au sérieux !"
+                        },
+                        {
+                            "id": 680879892,
+                            "name": "🔹 Règle n°5",
+                            "value": "Veuillez vous abstenir de parler de religion et de politique."
+                        },
+                        {
+                            "id": 314354559,
+                            "name": "🔹 Règle n°6",
+                            "value": "Soyez prudent lorsque vous publiez des informations réelles et ne révélez jamais d'informations privées sur quelqu'un d'autre ! (ceci sera sévèrement punis et ce sera le ban définitif)"
+                        },
+                        {
+                            "id": 350387756,
+                            "name": "🔹 Règle n°7",
+                            "value": "Pas de pings intempestifs."
+                        },
+                        {
+                            "id": 195391012,
+                            "name": "🔹 Règle n°8",
+                            "value": "Veuillez éviter de me dm moi ou les modérateurs si vous n'avez pas de questions par rapport au dessin ou aux commissions."
+                        },
+                        {
+                            "id": 304322515,
+                            "name": "🔹 Règle n°9",
+                            "value": "Si les règles ne sont pas respectés, des avertissements seront donnés et a partir de 3 le ban définitif tombera."
+                        }
+                    ]
+                }
+            ],
+            components: [row,row2],
+            files: [{
+                attachment: './assets/Proto1_rules.png',
+                name: 'reglement.png'
+              }]
         });
 
-        
+        await interaction.reply({ content:"Message envoyé!", ephemeral: true })
+
     }
 }

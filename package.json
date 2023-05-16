@@ -1,18 +1,30 @@
 {
   "name": "basic-discord-bot",
   "version": "1.0.0",
-  "description": "",
+  "description": "ouvrir un cmd dans le répertoire puis taper index.js, si nodejs est installé sur le pc celà devrait lancer le programme.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "Sylicium",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.27.2",
-    "discord.js": "^14.2.0",
+    "discord.js": "^14.11.0",
     "dom-parser": "^0.1.6",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
     "node-svg2img": "^1.1.0",
-    "ppfun-captcha": "^1.6.7"
-  }
+    "ppfun-captcha": "^1.6.7",
+    "socket.io": "^4.6.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sylicium/SIO-eiffel-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Sylicium/SIO-eiffel-bot/issues"
+  },
+  "homepage": "https://github.com/Sylicium/SIO-eiffel-bot#readme"
 }

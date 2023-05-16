@@ -7,17 +7,6 @@ const Logger = require("./localModules/logger")
 const somef = require("./localModules/someFunctions")
 const botf = require("./bot/botLocalModules/botFunctions")
 
-let birthdays = {
-    list: JSON.parse(fs.readFileSync("./datas/birthdays.json","utf-8")),
-    wished: JSON.parse(fs.readFileSync("./datas/birthdays_wished.json","utf-8")),
-    wishToId: (id) => {
-        if(birthdays.wished[(new Date()).getFullYear()] == undefined) birthdays.wished[(new Date()).getFullYear()] = []
-        birthdays.wished[(new Date()).getFullYear()].push(id)
-        return fs.writeFileSync("./datas/birthdays_wished.json",JSON.stringify(birthdays.wished,null,4))
-    }
-}
-
-
 let GlobalTemp = {
     cooldowns: {
         buttons: {
@@ -28,7 +17,7 @@ let GlobalTemp = {
 
 try {
     require("dotenv").config()
-} catch(e) {}
+} catch(e) { console.log(e) }
 
 let bot = new Discord.Client({
     intents: [
@@ -128,83 +117,6 @@ bot.on("ready", () => {
         ]
     });
 
-
-    let birthdayChannel = bot.channels.cache.get(config.static.channels.birthday)
-
-    function isAlreadyWished(identityOrId) {
-        if(birthdays.wished[(new Date()).getFullYear()] == undefined) birthdays.wished[(new Date()).getFullYear()] = []
-        return birthdays.wished[(new Date()).getFullYear()].includes( (identityOrId.id || identityOrId) )
-    }
-    function isBirthday(identity) {
-        let d = new Date()
-        console.log("identity.birthday.day == d.getDate()", identity.birthday.day, d.getDate() )
-        console.log("identity.birthday.month == d.getMonth()",identity.birthday.month, d.getMonth() )
-
-        return (
-            identity.birthday.day == d.getDate()
-            && identity.birthday.month == (d.getMonth()+1)
-        )
-    }
-    function getBirthdayString(identity) { return `${identity.birthday.day}/${identity.birthday.month}/${identity.birthday.year}` }
-    function checkForBirthdays() {
-
-        let birthdayListIdentity = []
-        for(let i in birthdays.list) {
-            let identity = birthdays.list[i]
-            if(!isBirthday(identity)) {
-                console.log(`Birthdays: Not for ${identity.last_name} ${identity.first_name} (${getBirthdayString(identity)})`)
-                continue;
-            }
-            if(isAlreadyWished(identity)) {
-                console.log(`Birthdays: Already wished for ${identity.last_name} ${identity.first_name} (${getBirthdayString(identity)})`)
-                continue;
-            }
-            logger.log(`Birthdays: BON ANNIVERSSAIRE A ${identity.last_name} ${identity.first_name} (${getBirthdayString(identity)}) !!!!!!!!!!!!!!!`)
-            birthdays.wishToId(identity.id)
-            birthdayListIdentity.push(identity)
-        }
-
-
-        async function getDiscordAccounts(identityList) {
-            let guild = bot.guilds.cache.get(birthdayChannel.guild.id)
-            let members = guild.members.fetch()
-            
-            return identityList.map((i, index) => {
-                return {
-                    identity: i,
-                    discord: guild.members.cache.find(m => { return (somef.compareString(`${m?.nickname || m?.user?.username || undefined}`.toLowerCase(), `${i.last_name} ${i.first_name}`.toLowerCase()) > 0.9) })
-                }
-            })
-        }
-
-        setTimeout(async () => {
-            try {
-                if(birthdayListIdentity.length == 0) return;
-                let birthdayListDiscordAccounts = await getDiscordAccounts(birthdayListIdentity)
-                birthdayChannel.send({
-                    content: [
-                        //`Aujourd'hui c'est l'anniversaire de: ${birthdayListIdentity.map((i) => { return `${i.last_name.toUpperCase()} ${i.first_name}` }).join(", ")}`,
-                        //`${birthdayListDiscordAccounts.map((i) => { return `<@${i.discord.id}>` })}`,
-                        `Aujourd'hui c'est l'anniversaire de:`,
-                        `${birthdayListDiscordAccounts.map((i) => { return ` ${i.discord ? `<@${i.discord.id}>` : `**${i.identity.last_name.toUpperCase()} ${i.identity.first_name}** en ${i.identity.class} (pas sur le serveur mais souhaitez lui irl si vous le croisez !)`}` }).join("\n")}`
-                    ].join("\n")
-                }).then(msg => {
-                    msg.react(":tada:")
-                    msg.react("🥳")
-                })
-            } catch(e) {
-                logger.warn(e)
-            }
-        }, 10)
-
-    }
-
-    setInterval(() => {
-        checkForBirthdays()
-    }, 11*60*60*1000 )
-    checkForBirthdays()
-    
-    
     try {
 
         if(config.bot.setApplicationCommandsOnStart) {
@@ -590,30 +502,6 @@ bot.on('interactionCreate', async (interaction) => {
     Logger.log("select interaction:",interaction)
 
     if(interaction.customId == "roleselector__roleselect_fcfafdd400f799f5") {
-        
-        if(!interaction.member.nickname) {
-            
-		    const temp_modal = new Discord.ModalBuilder()
-                .setCustomId('modal_change_nickname')
-                .setTitle('Se renommer en NOM prénom');
-
-            const temp_modal_1 = new Discord.TextInputBuilder()
-                .setCustomId('lastname')
-                .setLabel("Nom de famille")
-                .setStyle(Discord.TextInputStyle.Short);
-
-            const temp_modal_2 = new Discord.TextInputBuilder()
-                .setCustomId('firstname')
-                .setLabel("Prénom")
-                .setStyle(Discord.TextInputStyle.Short);
-
-            const temp_actionrow1 = new Discord.ActionRowBuilder().addComponents(temp_modal_1);
-            const temp_actionrow2 = new Discord.ActionRowBuilder().addComponents(temp_modal_2);
-
-            temp_modal.addComponents(temp_actionrow1, temp_actionrow2);
-            interaction.showModal(temp_modal);
-            return;
-        }
 
         //interaction.deferUpdate()
         if(interaction.values.length == 0) return await interaction.reply({

@@ -37,6 +37,8 @@ module.exports = {
             new Discord.SelectMenuBuilder()
                 .setCustomId(buttonID_role_select)
                 .setPlaceholder("Selectionne ta classe")
+                .setMinValues(0)
+                .setMaxValues(25)
                 .addOptions([
                     {
                         label: '=== Void ===',

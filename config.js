@@ -1,7 +1,7 @@
 
 try {
     require("dotenv").config()
-} catch(e) {}
+} catch(e) { console.log(e) }
 
 let indev = false
 
@@ -14,7 +14,7 @@ module.exports = {
         prefix: "!",
         id: "1014189091249733722",
         token: process.env["TOKEN"],
-        setApplicationCommandsOnStart: false,
+        setApplicationCommandsOnStart: true,
         setApplicationCommandsInLocal: true,
         setApplicationCommandsInLocal_guilds: [
             "792139282831507467", // test de bots

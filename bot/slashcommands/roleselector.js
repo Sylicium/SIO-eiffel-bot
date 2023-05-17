@@ -66,11 +66,48 @@ module.exports = {
         .addComponents(
             new Discord.StringSelectMenuBuilder()
                 .setCustomId(buttonID_role_select)
+<<<<<<< HEAD
                 .setPlaceholder("Selectionne tes roles")
                 .setMinValues(0)
                 .setMaxValues( (getOptionsPayload.length > 25 ? 25 : getOptionsPayload.length) )
                 .addOptions(getOptionsPayload),
         )
+=======
+                .setPlaceholder("Selectionne ta classe")
+                .addOptions([
+                    {
+                        label: '=== Void ===',
+                        description: 'Selection vide',
+                        value: 'void',
+                    },
+                    {
+                        label: 'SIO1A',
+                        description: 'SIO en première année, classe A',
+                        value: 'sio1a',
+                    },
+                    {
+                        label: 'SIO1B',
+                        description: 'SIO en première année, classe B',
+                        value: 'sio1b',
+                    },
+                    {
+                        label: 'SIO2A',
+                        description: 'SIO en seconde année, classe A',
+                        value: 'sio2a',
+                    },
+                    {
+                        label: 'SIO2B',
+                        description: 'SIO en seconde année, classe B',
+                        value: 'sio2b',
+                    },
+                    {
+                        label: 'Ancien',
+                        description: 'Si tu est un ancien élève du lycée',
+                        value: 'ancien',
+                    },
+                ]),
+        );
+>>>>>>> parent of 391a121 (Initial commit)
 
         /*
         const row2 = new Discord.ActionRowBuilder()

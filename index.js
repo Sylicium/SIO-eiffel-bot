@@ -604,13 +604,12 @@ bot.on('interactionCreate', async (interaction) => {
 
     if(interaction.customId == "roleselector__roleselect_fcfafdd400f799f5") {
         
-<<<<<<< HEAD
         let isASelectionnableRole = (roleID) => {
             for(let key in config.static.roleSelector) {
                 if(config.static.roleSelector[key] == roleID) return true
             }
             return false
-=======
+	}
         if(!interaction.member.nickname) {
             
 		    const temp_modal = new Discord.ModalBuilder()
@@ -633,7 +632,6 @@ bot.on('interactionCreate', async (interaction) => {
             temp_modal.addComponents(temp_actionrow1, temp_actionrow2);
             interaction.showModal(temp_modal);
             return;
->>>>>>> parent of 391a121 (Initial commit)
         }
 
         let selectionableRolesList = interaction.guild.roles.cache.filter((r) => isASelectionnableRole(r.id) )

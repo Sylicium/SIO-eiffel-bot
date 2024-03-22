@@ -66,13 +66,13 @@ module.exports = {
         .addComponents(
             new Discord.StringSelectMenuBuilder()
                 .setCustomId(buttonID_role_select)
-<<<<<<< HEAD
-                .setPlaceholder("Selectionne tes roles")
-                .setMinValues(0)
-                .setMaxValues( (getOptionsPayload.length > 25 ? 25 : getOptionsPayload.length) )
-                .addOptions(getOptionsPayload),
-        )
-=======
+// <<<<<<< HEAD
+//                 .setPlaceholder("Selectionne tes roles")
+//                 .setMinValues(0)
+//                 .setMaxValues( (getOptionsPayload.length > 25 ? 25 : getOptionsPayload.length) )
+//                 .addOptions(getOptionsPayload),
+//         )
+// =======
                 .setPlaceholder("Selectionne ta classe")
                 .addOptions([
                     {
